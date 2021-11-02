@@ -1,0 +1,240 @@
+;; pendulum pal file
+
+;; an implimentation of the quick sort algorithm... reversibly
+	.start main
+
+main:	ADDI $1 1400			; address of the data
+	ADDI $2 0			; first argument (left)
+	ADDI $3 5			; second argument (right)
+	ADDI $4 1000			; stack for subroutine args
+	ADDI $19 1200			; stack for return addresses
+	ADDI $16 1600			; stack for temp data
+	EXCH $2 $4 			; put the arguments...
+	ADDI $4 1			; ... on the stack
+	EXCH $3 $4 			
+	ADDI $4 1
+	BRA  load			; load the values
+	BRA  disp			; display them (first 6)
+	BRA  qsort			; sort them
+	BRA  disp			; display them (second 6)
+	RBRA qsort			; un-sort them
+	BRA disp			; display them (third 6)
+	RBRA load			; unload the values
+	finish				; done
+
+
+
+
+
+
+
+
+
+subtop:		BRA subbot
+qsort:		SWAPBR $20		; swap the BR into $20
+		NEG $20				; make it negative
+		EXCH $20 $19		; return address -> stack
+		ADDI $19 1
+		ADDI $4 -1
+		EXCH $3 $4			; fetch it from the stack
+		ADDI $4 -1
+		EXCH $2 $4
+		ADDI $4 -1
+		ADD $5 $2		
+		SUB $5 $3				; temp1 <- (left-right)
+iftop_0:	BLTZ $5 ifbot_0		; if(left >= right) {
+		ADD $5 $3				; 	temp1 -> (left-right)
+		SUB $5 $2				;    
+		XORI $18 1
+returntop:	BNE $18 $0 returnbot;    and return!
+ifbot_0:	BLTZ $5 iftop_0		; }
+		ADD $5 $3				; temp1 -> (left-right)
+		SUB $5 $2
+	
+		; do the swap
+		ADD $30 $2				; argL <- left;
+		ADD $27 $2				; 
+		ADD $27 $3				; temp <- left+right;
+		SRLX $31 $27 1			; argR <- (left+right)/2;
+		BRA swap				; swap(argL, argR);
+		SRLX $31 $27 1			; argR -> (left+right)/2;
+		SUB $27 $3		
+		SUB $27 $2				; temp -> left+right;
+		SUB $30 $2				; argL -> left
+		
+		ADD $6 $2				; last <- left;
+		ADD $7 $2				; 
+		ADDI $7 1				; temp <- left + 1
+		ADD $5 $7				; i <- left + 1;
+		ADD $8 $3				; 
+		ADDI $8 1				; limit <- right +1;
+
+looptop:	BNE $5 $7 loopbot	; unless (i != left+1) do
+		ADD $9 $1
+		ADD $9 $5				; $9 <- &array[i];
+		ADD $10 $1
+		ADD $10 $2				; $10 <- &array[left];
+		; get the values
+		EXCH $11 $9				; $11 <-> array[i]		
+		EXCH $12 $10			; $12 <-> array[left]
+		ADD $13 $12
+		SUB $13 $11				; $13 <- ($12 - $11)
+iftop_1:	BLEZ $13 ifbot_1	; if(array[i] < array[left]) {
+		EXCH $11 $9				; $11 <-> *($9)
+		EXCH $12 $10			; $12 <-> *($10)
+		ADDI $6 1				; last <- (last++)
+		ADD $30 $6				; argL <- last;
+		ADD $31 $5				; argR <- i;
+		BRA swap				; swap(argL, argR);
+		SUB $30 $6				; argL -> last
+		SUB $31 $5				; argR -> i
+		EXCH $11 $9				; $11 <-> *($9)
+		EXCH $12 $10			; $12 <-> *($10)
+ifbot_1:	BLEZ $13 iftop_1	; }	
+		EXCH $13 $16			; save it for later
+		ADDI $16 1
+		EXCH $11 $9				; $11 <-> array[i]
+		EXCH $12 $10			; $12 <-> array[left]
+		SUB $10 $2				; $10 -> &array[left]
+		SUB $10 $1
+		SUB $9 $5				; $9 -> &array[i]
+		SUB $9 $1
+		ADDI $5 1				; i <- ($i++);
+loopbot:	BNE $5 $8 looptop	; repeat while(i != right+1)
+		ADDI $8 -1				;
+		SUB $8 $3				; limit -> (right + 1)
+		SUB $5 $7				; i -> left + 1
+		SUB $5 $3				; i -> right
+		ADDI $7 -1		
+		SUB $7 $2				; temp1 -> left + 1
+		
+		ADD $30 $2		; argL <- left
+		ADD $31 $6		; argR <- last
+		BRA swap		; swap(argL, argR);
+		SUB $31 $6		; argR -> last
+		SUB $30 $2		; argL -> left
+
+
+		; CALLER MUST SAVE STATE!
+
+		ADD $14 $6
+		ADDI $14, 1
+		EXCH $14 $4
+		ADDI $4 1
+		
+		EXCH $3 $4
+		ADDI $4 1
+
+		EXCH $2 $4 ; push left onto the stack
+		ADDI $4 1
+
+		ADDI $6 -1  ; push last - 1 onto the stack
+		EXCH $6 $4
+		ADDI $4 1
+
+
+
+		BRA qsort		; qsort(left, last-1);
+		BRA qsort		; qsort(last, right);
+
+returnbot:	BNE $18 $0 returntop
+		EXCH $18 $16
+		ADDI $16 1
+		ADDI $19 -1
+		EXCH $20 $19
+subbot: 	BRA subtop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+swaptop: 	BRA swapbot		; swap ($30, $31) {
+swap:		SWAPBR $21
+		NEG $21
+
+
+iftop_2:	BEQ $30 $31 ifbot_2
+
+					; grab them from memory
+		ADD $30 $1
+		ADD $31 $1
+
+		EXCH $28 $30
+		EXCH $29 $31
+					;swap the values
+		XOR $28 $29
+		XOR $29 $28
+		XOR $28 $29	
+					;put them back into memory
+		EXCH $28 $30
+		EXCH $29 $31
+	
+		SUB $30 $1
+		SUB $31 $1
+ifbot_2:	BEQ $30 $31 iftop_2
+swapbot: 	BRA swaptop		; }
+
+loadtop:        BRA loadbot             ; load () {
+load:           SWAPBR $21
+                NEG $21
+
+		ADDI $5 56
+		EXCH $5 $1
+		ADDI $1 1
+		ADDI $5 23
+		EXCH $5 $1
+		ADDI $1 1
+		ADDI $5 45
+		EXCH $5 $1
+		ADDI $1 1
+		ADDI $5 67
+		EXCH $5 $1
+		ADDI $1 1
+		ADDI $5 12
+		EXCH $5 $1
+		ADDI $1 1
+		ADDI $5 35
+		EXCH $5 $1
+		ADDI $1 -5
+loadbot:        BRA loadtop             ; }
+
+disptop:        BRA dispbot             ; disp () {
+disp:           SWAPBR $21
+                NEG $21
+
+		EXCH $17 $1
+		OUTPUT $17
+		EXCH $17 $1
+		ADDI $1 1
+		EXCH $17 $1
+		OUTPUT $17
+		EXCH $17 $1
+		ADDI $1 1
+		EXCH $17 $1
+		OUTPUT $17
+		EXCH $17 $1
+		ADDI $1 1
+		EXCH $17 $1
+		OUTPUT $17
+		EXCH $17 $1
+		ADDI $1 1
+		EXCH $17 $1
+		OUTPUT $17
+		EXCH $17 $1
+		ADDI $1 1
+		EXCH $17 $1
+		OUTPUT $17
+		EXCH $17 $1
+		ADDI $1 -5
+
+dispbot:        BRA disptop             ; }
+

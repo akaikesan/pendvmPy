@@ -1,0 +1,9 @@
+;; pendulum pal file
+.start main
+main:   ADDI $1 1
+loop:   swapbr $31
+        ADD  $2 $1
+        BEQ  $1 $2 loop
+        andx $3 $2 $1
+        andix $4 $2 0
+        finish
