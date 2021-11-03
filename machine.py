@@ -1,7 +1,7 @@
 import sys
 from memory import mem_get, memory, MEM_DATA, MEM_INST
 from pal_parse import lt, LT, parse_inst
-from pendvm import m, FORWARD, REVERSE, EXEC_FINISH, EXEC_INVALID_INST
+from pendvm import m, FORWARD, REVERSE, EXEC_FINISH, EXEC_INVALID_INST,EXEC_ERROR,EXEC_NORMAL
 
 
 
@@ -81,6 +81,9 @@ def step_processor(iterations):
             iterations -= 1
         if(result == EXEC_FINISH):
             return EXEC_FINISH
+        elif result == EXEC_ERROR:
+            return EXEC_ERROR
+    return EXEC_NORMAL
 
 
 
@@ -107,6 +110,8 @@ def execute_instruction():
         return EXEC_INVALID_INST
     elif status == -3:
         return EXEC_FINISH
+    elif status == -4:
+        return EXEC_ERROR
 
 
 

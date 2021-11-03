@@ -1,9 +1,50 @@
 ;; pendulum pal file
+
 .start main
-main:   ADDI $1 1
-loop:   swapbr $31
-        ADD  $2 $1
-        BEQ  $1 $2 loop
-        andx $3 $2 $1
-        andix $4 $2 0
-        finish
+
+main: start
+      ADDI $1 1000
+      ADDI   $3 5
+      ADDI   $4 4
+      BRA    mult
+      RBRA   mult
+      finish
+
+subtop:   BRA    subbot          ; MULT top.
+mult:     SWAPBR $2              ; Subroutine entry/exit point.
+          NEG    $2              ; Negate offset to return to caller.
+          EXCH   $2 $1           ; Push return offset to stack.
+          BRA    alloc4          ; Allocate 4 empty registers (R28-R31).
+          ADDI   $31 32          ; limit <- 32
+          ADDI   $2 1            ; mask <- 1
+looptop:  BNE    $30 $0 loopbot  ; unless (position != 0) do
+          ANDX   $28 $3 $2       ;     bit <- m1&mask
+iftop:    BEQ    $28 $0 ifbot    ;     if (bit != 0) then
+          SLLVX  $29 $4 $30      ;        shifted <- m2<<position
+          ADD    $5  $29         ;        product += shifted
+          OUTPUT $5              ; output product as it is calculated
+          SLLVX  $29 $4 $30      ;        shifted -> m2<<position
+ifbot:    BEQ    $28 $0 iftop    ;     end if
+          ANDX   $28 $3 $2       ;     bit -> m1&mask
+          RL     $2 1            ;     mask <=< 1 (rotate left by 1)
+          ADDI   $30 1           ;     position++
+loopbot:  BNE    $30 $31 looptop ; and repeat while (position != limit).
+          SUB    $30 $31         ; position -> limit
+          ADDI   $2 -1           ; mask -> 1
+          ADDI   $31 -32         ; limit -> 32
+          RBRA   alloc4          ; Deallocate 4 registers (R28-R31).
+          EXCH   $2 $1           ; Pop return address.
+subbot:   BRA    subtop          ; MULT bottom.
+
+alloctop: BRA    allocbot
+alloc4:   SWAPBR $2          ; This sub-subroutine frees
+          NEG    $2          ; 4 registers for use in the
+          ADDI   $1  1       ; MULT subroutine.  It leaves
+          EXCH   $31 $1      ; the stack pointer pushed
+          ADDI   $1  1       ; above, but we don't mind.
+          EXCH   $30 $1
+          ADDI   $1  1
+          EXCH   $29 $1
+          ADDI   $1  1
+          EXCH   $28 $1
+allocbot: BRA    alloctop

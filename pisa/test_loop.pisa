@@ -1,0 +1,9 @@
+;; pendulum pal file
+.start main
+main:           ADDI  $1 3
+loop_top:       BNE   $2 $0 loop_bot
+                ADDI  $2 1
+loop_bot:       BRA loop_top
+                andx  $3 $2 $1
+                andix $4 $2 0
+                finish

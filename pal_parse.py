@@ -2,12 +2,12 @@ import sys
 from instruction_process import * 
 
 
-NIL  = 0
-REG  = 1
-IMM  = 2
-AMT  = 4
-OFF  = 8
-LOFF = 16
+NIL  = 0  # 
+REG  = 1  # register
+IMM  = 2  # immediate
+AMT  = 4  # Expression for the amount to shift by.
+OFF  = 8  # 16 bit signed offset 
+LOFF = 16 # 26 bit signed offset 
 
 LT = []
 
@@ -22,8 +22,37 @@ instructions = [
     Instruction("ANDX",  [REG, REG, REG], i_andx),
     Instruction("ANDIX",  [REG, REG, IMM], i_andix),
     Instruction("BEQ", [REG, REG, OFF], i_beq),
+    Instruction("BGEZ", [REG, OFF, NIL], i_bgez),
+    Instruction("BGTZ", [REG, OFF, NIL], i_bgtz),
+    Instruction("BLEZ", [REG, OFF, NIL], i_blez),
+    Instruction("BLTZ", [REG, OFF, NIL], i_bltz),
+    Instruction("BNE", [REG, REG, OFF], i_bne),
+    Instruction("BRA", [LOFF, NIL, NIL], i_bra),
+    Instruction("EXCH", [REG, REG, NIL], i_exch),
+    Instruction("NORX", [REG, REG, REG], i_norx),
+    Instruction("NEG", [REG, NIL, NIL], i_neg),
+    Instruction("ORX", [REG, REG, REG], i_orx),
+    Instruction("ORIX", [REG, REG, IMM], i_orix),
+    Instruction("RL", [REG, AMT, NIL], i_rl),
+    Instruction("RLV", [REG, REG, NIL], i_rlv),
+    Instruction("RR", [REG, AMT, NIL], i_rr),
+    Instruction("RRV", [REG, REG, NIL], i_rrv),
+    Instruction("SLLX", [REG, REG, AMT], i_sllx),
+    Instruction("SLLVX", [REG, REG, REG], i_sllvx),
+    Instruction("SLTX", [REG, REG, REG], i_sltx),
+    Instruction("SLTIX", [REG, REG, IMM], i_sltix),
+    Instruction("SRAX", [REG, REG, AMT], i_srax),
+    Instruction("SRAVX", [REG, REG, REG], i_sravx),
+    Instruction("SRLX", [REG, REG, AMT], i_srlx),
+    Instruction("SRLVX", [REG, REG, REG], i_srlvx),
+    Instruction("SUB", [REG, REG, NIL], i_sub),
+    Instruction("XOR", [REG, REG, NIL], i_xorx),
+    Instruction("XORI", [REG, IMM, NIL], i_xorix),
     Instruction("SWAPBR", [REG, NIL, NIL], i_swapbr),
-
+    Instruction("RBRA", [LOFF, NIL, NIL], i_rbra),
+    Instruction("OUTPUT", [REG, NIL, NIL], i_show),
+    Instruction("SHOW", [REG, NIL, NIL], i_show),
+    Instruction("START",  [NIL,NIL,NIL], i_start),
     Instruction("FINISH",  [NIL,NIL,NIL], i_finish),
     Instruction( None,   [REG, IMM, NIL], None),
 ]
@@ -56,8 +85,7 @@ def parse_inst(label, inst, args):
                 return -1
             else:
                 a.append(reg)
-        #elif instructions[i].args[j] == AMT:
-        elif instructions[i].args[j] == IMM:
+        elif instructions[i].args[j] == IMM or instructions[i].args[j] == AMT:
             a.append(parse_immed(args[j]))
 
         elif instructions[i].args[j] == OFF or instructions[i].args[j] == LOFF:

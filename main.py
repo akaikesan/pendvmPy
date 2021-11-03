@@ -14,8 +14,9 @@ def main():
     args = sys.argv
     global progname
     progname = args[0]
-    load_imem(args[2])
-    parse_command_line(args)
+    inp = parse_command_line(args)
+    load_imem(inp)
+    
 
     if (interactive):
         print("pendvm ",VERSION)
@@ -27,13 +28,21 @@ def main():
     return
 
 
-
+# return input file path
 def parse_command_line(args):
     if args[1] == "--debug":
         global interactive
         interactive = True
+
+        return args[2]
+
     elif args[1] == OPTION_HELP:
         usage()
+        sys.exit()
+
+    else:
+        return args[1]
+
 
 def loop():
     buffer = ""
@@ -42,7 +51,8 @@ def loop():
         print("(pendvm)", end='')
         buffer = input()
         buffer.strip()
-        if buffer == "\n":
+
+        if buffer == "":
             buffer = oldbuffer
         else:
             oldbuffer = buffer

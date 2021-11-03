@@ -8,7 +8,8 @@ class Command:
 
 
 command = [
-    Command("step", com_step, "reg - display registers")
+    Command("step", com_step, "reg - display registers"),
+    Command("quit", com_quit, "quit - exit pendvm"),
 ]
 
 

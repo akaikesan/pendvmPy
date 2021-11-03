@@ -9,13 +9,13 @@ memory = []
 
 class Memory:
     def __init__(self, address):
-        self.address = address
-        self.label = ""
-        self.type = MEM_EMPTY
+        self.address    = address
+        self.label      = ""
+        self.type       = MEM_EMPTY
         self.breakpoint = 0
-        self.value = 0
-        self.inst = ""
-        self.args = ["", "", ""]
+        self.value      = 0
+        self.inst       = ""
+        self.args       = ["", "", ""]
 
 
 
