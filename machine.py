@@ -22,7 +22,6 @@ def load_imem(input):
             line += 1
             l = strip_comments(l)
             fields = l.strip().split()
-
             if len(fields) == 0 :
                 continue
 
@@ -66,13 +65,13 @@ def load_imem(input):
                     mem.args[i-1-inst_offset] = fields[i]
                     i += 1
             continue
-                
+
 def step_processor(iterations):
     loop = True
     if iterations < 0:
         loop = False
         iterations = 1
-    
+
     m.reset = False
     while (iterations > 0):
         result = execute_instruction()
@@ -91,7 +90,7 @@ def strip_comments(line):
     i = 0
     for l in line:
         if(l == ";"):
-            line = line[0:i-1]
+            line = line[0:i]
             break
         i += 1   
     return line

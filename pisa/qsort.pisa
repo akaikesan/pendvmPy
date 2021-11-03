@@ -118,7 +118,7 @@ loopbot:	BNE $5 $8 looptop	; repeat while(i != right+1)
 		; CALLER MUST SAVE STATE!
 
 		ADD $14 $6
-		ADDI $14, 1
+		ADDI $14 1
 		EXCH $14 $4
 		ADDI $4 1
 		
