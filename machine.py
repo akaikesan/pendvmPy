@@ -50,7 +50,7 @@ def load_imem(input):
             if fields[inst_offset].lower() == "data":
                 mem.type = MEM_DATA
             
-                if len(fileds) - inst_offset != 2 :
+                if len(fields) - inst_offset != 2 :
                     print("poorly formatted dw declaration")
                     error_flag += 1
                     continue

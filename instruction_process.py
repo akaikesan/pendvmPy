@@ -219,7 +219,7 @@ def i_sub( rsd,  rt,  u1):
     return 0
 
 def i_xorx( rsd,  rt,  u1):
-    m.reg[rsd] ^= m.reg[rt]
+    m.reg[rsd] ^= int(m.reg[rt])
     return 0
 
 def i_xorix( rsd,  imm,  u1):
