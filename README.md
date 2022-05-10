@@ -1,3 +1,3 @@
 ```
-$ python3 main.py <inputfile> [--option]
+$ python3 main.py [--option] <inputfile> 
 ```
